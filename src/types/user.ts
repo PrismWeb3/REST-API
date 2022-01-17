@@ -1,19 +1,19 @@
 export type User = {
   _id: string;
   username: string;
-  user_public_key: string;
+  userPublicKey: string;
   clients: [
     {
       _id: string;
       name: string;
-      client_public_key: string;
-      paper_key: boolean;
+      clientPublicKey: string;
+      paperKey: boolean;
     },
   ];
-  created_at: number;
-  temp_keys: [{
-    public_key: string;
-    expires_at: number;
-    signed_by: string;
+  createdAt: number;
+  tempKeys: [{
+    publicKey: string;
+    expiresAt: number;
+    signedBy: string;
   }] | [];
 };

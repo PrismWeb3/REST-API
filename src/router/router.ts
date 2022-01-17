@@ -1,5 +1,5 @@
 import { Request, Response, Router, RouterContext } from "../deps.ts";
-import { handleNewUser } from "./newUser.ts";
+import { handleNewUser } from "./handler.ts";
 
 class Routes {
   req: Request;

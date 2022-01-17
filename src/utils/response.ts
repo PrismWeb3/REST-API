@@ -1,7 +1,7 @@
 import { Response } from "../deps.ts";
 
 class Respond {
-  static error = (res: Response, code: number, msg: string) => {
+  static send = (res: Response, code: number, msg: string) => {
     res.status = code;
     res.body = msg + "\n";
   };

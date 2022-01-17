@@ -1,38 +1,33 @@
 import { Request, Response, Snowflake } from "../deps.ts";
-import { Respond } from "../utils/response.ts";
-import { Crypto } from "../utils/crypto.ts";
+import { Crypto, Respond } from "../utils/utils.ts";
 import { dbClient } from "../main.ts";
-import { NewUserRequest } from "../types/reqest.ts";
-import { User } from "../types/user.ts";
+import { NewUserRequest, User } from "../types/types.ts";
+import { Errors } from "../global/global.ts";
 
 async function handleNewUser(req: Request, res: Response) {
   if (req.headers.get("Content-Type") != "application/json") {
-    return Respond.error(
+    return Respond.send(
       res,
       400,
-      "HEADER NOT FOUND: Content-Type: application/json",
+      Errors.contentTypeNotFound,
     );
   } else {
     await req
       .body({ type: "json" })
       .value.then(async (jsonBody: NewUserRequest) => {
         if (!jsonBody.username || !jsonBody.newDeviceName) {
-          return Respond.error(
+          return Respond.send(
             res,
             400,
-            `SOME REQUIERED FIELDS NOT FOUND: ${
-              !jsonBody.username && !jsonBody.newDeviceName
-                ? "username, newDeviceName"
-                : (!jsonBody.username ? "username" : "newDeviceName")
-            }`,
+            Errors.usernameDeviceNameNotFound,
           );
         }
 
         if (jsonBody.newUserPublicKey === jsonBody.newDevicePublicKey) {
-          return Respond.error(
+          return Respond.send(
             res,
             400,
-            "DUPLICATE INPUTS: newDevicePublicKey, newUserPublicKey",
+            Errors.duplicateSignupKeyInputs,
           );
         }
 
@@ -42,10 +37,10 @@ async function handleNewUser(req: Request, res: Response) {
               atob(jsonBody.newDevicePublicKey),
             );
         } catch {
-          return Respond.error(
+          return Respond.send(
             res,
             400,
-            "SOME REQUIERED FIELDS ARE INVALID: newDevicePublicKey, newUserPublicKey; BASE64 RSA 4096 PUBLIC KEYS EXPECTED",
+            Errors.invalidSignupKeys,
           );
         }
 
@@ -63,10 +58,10 @@ async function handleNewUser(req: Request, res: Response) {
         const users = db.collection<User>("users");
 
         if (await users.findOne({ username: jsonBody.username })) {
-          return Respond.error(
+          return Respond.send(
             res,
             400,
-            "USERNAME ALREADY EXISTS",
+            Errors.existingUsername,
           );
         } else {
           await users.insertOne({
@@ -74,19 +69,19 @@ async function handleNewUser(req: Request, res: Response) {
               epoch: new Date("July 06 2021").getTime() / 1000,
             }),
             username: jsonBody.username,
-            user_public_key: jsonBody.newUserPublicKey,
+            userPublicKey: jsonBody.newUserPublicKey,
             clients: [
               {
                 _id: Snowflake.generate({
                   epoch: new Date("July 06 2021").getTime() / 1000,
                 }),
                 name: jsonBody.newDeviceName,
-                client_public_key: jsonBody.newDevicePublicKey,
-                paper_key: false,
+                clientPublicKey: jsonBody.newDevicePublicKey,
+                paperKey: false,
               },
             ],
-            created_at: Date.now(),
-            temp_keys: [],
+            createdAt: Date.now(),
+            tempKeys: [],
           }).then((u) => {
             res.status = 200;
             res.body = u;
@@ -99,10 +94,10 @@ async function handleNewUser(req: Request, res: Response) {
         console.error("E:", e);
         // We could probally use the error to provide a better response message, but this should surfice for now.
         try {
-          return Respond.error(
+          return Respond.send(
             res,
             400,
-            "FIELD NOT FOUND: UNKNOWN REQUEST ERROR - PAYLOAD TOO LARGE?",
+            Errors.unknownPayloadTooLarge,
           );
         } catch {
           // If an unexpected error occurs the above response fail, so we catch any possble errors to save the process from exiting.
