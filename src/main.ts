@@ -1,5 +1,5 @@
 import { Application } from "./deps.ts";
-import { router } from "./router/router.ts";
+import { router } from "./router/export.ts";
 import { DataBase } from "./db/connect.ts";
 import { Events } from "./events/events.ts";
 

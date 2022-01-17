@@ -9,6 +9,10 @@ class Errors {
     "SOME REQUIERED FIELDS ARE INVALID: newDevicePublicKey, newUserPublicKey; BASE64 RSA 4096 PUBLIC KEYS EXPECTED";
   static existingUsername = "USERNAME ALREADY EXISTS";
   static unknownPayloadTooLarge = "UNKNOWN REQUEST ERROR - PAYLOAD TOO LARGE?";
+  static mongoConnectionError = "MONGODB CONNECTION ERROR - COULD NOT CONNECT";
+  static invalidGetUserInput =
+    "INVALID INPUT: id, userPublicKey, OR username REQUIERED";
+  static UserNotFound = "INVALID INPUT: USER NOT FOUND";
 }
 
 export { Errors };

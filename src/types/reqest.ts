@@ -1,6 +1,12 @@
 export type NewUserRequest = {
   username: string;
-  newUserPublicKey: string; // RSA 4096 Public Key
+  newUserPublicKey: string; // Base64-encoded RSA Public Key PEM
   newDeviceName: string;
-  newDevicePublicKey: string; // RSA 4096 Public Key
+  newDevicePublicKey: string; // Base64-encoded RSA Public Key PEM
+};
+
+export type GetUserRequest = {
+  id?: string;
+  userPublicKey?: string; // Base64-encoded RSA Public Key PEM
+  username?: string;
 };

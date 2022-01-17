@@ -1,17 +1,11 @@
 import { Request, Response, Snowflake } from "../deps.ts";
-import { Crypto, Respond } from "../utils/utils.ts";
+import { Crypto, Respond } from "../utils/export.ts";
 import { dbClient } from "../main.ts";
-import { NewUserRequest, User } from "../types/types.ts";
-import { Errors } from "../global/global.ts";
+import { NewUserRequest, User } from "../types/export.ts";
+import { Errors } from "../global/export.ts";
 
 async function handleNewUser(req: Request, res: Response) {
-  if (req.headers.get("Content-Type") != "application/json") {
-    return Respond.send(
-      res,
-      400,
-      Errors.contentTypeNotFound,
-    );
-  } else {
+  if (Respond.checkContetType(req, res, "application/json")) {
     await req
       .body({ type: "json" })
       .value.then(async (jsonBody: NewUserRequest) => {

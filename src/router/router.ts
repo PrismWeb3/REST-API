@@ -1,5 +1,5 @@
 import { Request, Response, Router, RouterContext } from "../deps.ts";
-import { handleNewUser } from "./handler.ts";
+import { handleGetUser, handleNewUser } from "./export.ts";
 
 class Routes {
   req: Request;
@@ -22,6 +22,9 @@ class Routes {
   async NewUser() {
     await handleNewUser(this.req, this.res);
   }
+  async GetUser() {
+    await handleGetUser(this.req, this.res);
+  }
 }
 
 const router = new Router();
@@ -29,8 +32,11 @@ router
   .get("/", (context) => {
     new Routes(context).Root();
   })
-  .post("/new_user", async (context) => {
+  .post("/newUser", async (context) => {
     await new Routes(context).NewUser();
+  })
+  .post("/getUser", async (context) => {
+    await new Routes(context).GetUser();
   });
 
 export { router };
