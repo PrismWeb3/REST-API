@@ -47,7 +47,33 @@ async function handleNewUser(req: Request, res: Response) {
         which you could verify that a speciifc key has "chosen" a username. This ensures that the server did not assign an initial
         public key to a username that it did not request (And that the client sending the request actually owns the private key).
          */
-
+        if (
+          !jsonBody.proof || jsonBody.proof.tx.type != "newUser" ||
+          jsonBody.proof.tx.prevHash != null || jsonBody.proof.tx.body.id ||
+          jsonBody.proof.tx.body.publicKey != jsonBody.newUserPublicKey ||
+          jsonBody.proof.tx.body.username != jsonBody.username ||
+          jsonBody.proof.tx.body.device.name != jsonBody.newDeviceName ||
+          jsonBody.proof.tx.body.device.publicKey !=
+            jsonBody.newDevicePublicKey ||
+          jsonBody.proof.txHash !=
+            await Crypto.hash(JSON.stringify(jsonBody.proof.tx)) ||
+          !await Crypto.verifyRSAMessage(
+            jsonBody.proof.tx.body.publicKey,
+            jsonBody.proof.txHash,
+            jsonBody.proof.signature,
+          ) ||
+          !await Crypto.verifyRSAMessage(
+            jsonBody.proof.tx.body.device.publicKey,
+            jsonBody.proof.tx.body.deviceHash,
+            jsonBody.proof.tx.body.deviceSignature,
+          )
+        ) {
+          return Respond.send(
+            res,
+            400,
+            Errors.invalidProof,
+          );
+        }
         const db = dbClient.database("prism");
         const users = db.collection<User>("users");
 
@@ -76,6 +102,7 @@ async function handleNewUser(req: Request, res: Response) {
             ],
             createdAt: Date.now(),
             tempKeys: [],
+            chain: [jsonBody.proof],
           }).then((u) => {
             res.status = 200;
             res.body = u;

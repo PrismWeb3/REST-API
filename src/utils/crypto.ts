@@ -17,16 +17,45 @@ class Crypto {
     );
     const binaryDerString = atob(pemContents);
     const binaryDer = this.arrayBufferFromString(binaryDerString);
-    return window.crypto.subtle.importKey(
+    return crypto.subtle.importKey(
       "spki",
       binaryDer,
       {
-        name: "RSA-OAEP",
+        name: "RSASSA-PKCS1-v1_5",
         hash: "SHA-256",
       },
       true,
-      ["encrypt"],
+      ["verify"],
     );
+  }
+
+  static hash(input: string) {
+    const utf8 = new TextEncoder().encode(input);
+    return crypto.subtle.digest("SHA-256", utf8).then((hashBuffer) => {
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray
+        .map((bytes) => bytes.toString(16).padStart(2, "0"))
+        .join("");
+      return hashHex;
+    });
+  }
+
+  static async verifyRSAMessage(
+    publicKey: string,
+    message: string,
+    signature: string,
+  ) {
+    const decodedSignature = atob(signature);
+    const decodedPublicKey = await this.importPublicRSA(atob(publicKey));
+
+    const enc = new TextEncoder();
+    const result = await crypto.subtle.verify(
+      "RSASSA-PKCS1-v1_5",
+      decodedPublicKey,
+      this.arrayBufferFromString(decodedSignature),
+      enc.encode(message),
+    );
+    return result;
   }
 }
 

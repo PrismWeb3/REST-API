@@ -13,6 +13,7 @@ class Errors {
   static invalidGetUserInput =
     "INVALID INPUT: id, userPublicKey, OR username REQUIERED";
   static UserNotFound = "INVALID INPUT: USER NOT FOUND";
+  static invalidProof = "INVALID PROOF: SIGNED TX PROOF REQUIERED";
 }
 
 export { Errors };
