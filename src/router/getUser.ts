@@ -2,7 +2,7 @@ import { dbClient } from "../main.ts";
 import { Respond } from "../utils/export.ts";
 import { Request, Response } from "../deps.ts";
 import { Errors } from "../global/export.ts";
-import { GetUserRequest, User } from "../types/export.ts";
+import {GetUserRequest, User} from "../types/export.ts"
 
 async function handleGetUser(req: Request, res: Response) {
   if (Respond.checkContetType(req, res, "application/json")) {

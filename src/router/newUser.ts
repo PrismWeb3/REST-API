@@ -1,15 +1,15 @@
 import { Request, Response, Snowflake } from "../deps.ts";
 import { Crypto, Respond } from "../utils/export.ts";
 import { dbClient } from "../main.ts";
-import { NewUserRequest, User } from "../types/export.ts";
+import { PostReqest, User } from "../types/export.ts";
 import { Errors } from "../global/export.ts";
 
 async function handleNewUser(req: Request, res: Response) {
   if (Respond.checkContetType(req, res, "application/json")) {
     await req
       .body({ type: "json" })
-      .value.then(async (jsonBody: NewUserRequest) => {
-        if (!jsonBody.username || !jsonBody.newDeviceName) {
+      .value.then(async (jsonBody: PostReqest) => {
+        if (!jsonBody.tx.body.username || !jsonBody.tx.body.device.name) {
           return Respond.send(
             res,
             400,
@@ -17,7 +17,7 @@ async function handleNewUser(req: Request, res: Response) {
           );
         }
 
-        if (jsonBody.newUserPublicKey === jsonBody.newDevicePublicKey) {
+        if (jsonBody.tx.body.publicKey === jsonBody.tx.body.device.publicKey) {
           return Respond.send(
             res,
             400,
@@ -26,9 +26,9 @@ async function handleNewUser(req: Request, res: Response) {
         }
 
         try {
-          await Crypto.importPublicRSA(atob(jsonBody.newUserPublicKey)),
+          await Crypto.importPublicRSA(atob(jsonBody.tx.body.publicKey)),
             await Crypto.importPublicRSA(
-              atob(jsonBody.newDevicePublicKey),
+              atob(jsonBody.tx.body.device.publicKey),
             );
         } catch {
           return Respond.send(
@@ -48,24 +48,19 @@ async function handleNewUser(req: Request, res: Response) {
         public key to a username that it did not request (And that the client sending the request actually owns the private key).
          */
         if (
-          !jsonBody.proof || jsonBody.proof.tx.type != "newUser" ||
-          jsonBody.proof.tx.prevHash != null || jsonBody.proof.tx.body.id ||
-          jsonBody.proof.tx.body.publicKey != jsonBody.newUserPublicKey ||
-          jsonBody.proof.tx.body.username != jsonBody.username ||
-          jsonBody.proof.tx.body.device.name != jsonBody.newDeviceName ||
-          jsonBody.proof.tx.body.device.publicKey !=
-            jsonBody.newDevicePublicKey ||
-          jsonBody.proof.txHash !=
-            await Crypto.hash(JSON.stringify(jsonBody.proof.tx)) ||
+          !jsonBody.tx || !jsonBody.tx.body.username  || !jsonBody.tx.body.name || jsonBody.tx.type != "newUser" ||
+          jsonBody.tx.prevHash != null || jsonBody.tx.body.id ||
+          jsonBody.txHash !=
+            await Crypto.hash(JSON.stringify(jsonBody.tx)) ||
           !await Crypto.verifyRSAMessage(
-            jsonBody.proof.tx.body.publicKey,
-            jsonBody.proof.txHash,
-            jsonBody.proof.signature,
+            jsonBody.tx.body.publicKey,
+            jsonBody.txHash,
+            jsonBody.signature,
           ) ||
           !await Crypto.verifyRSAMessage(
-            jsonBody.proof.tx.body.device.publicKey,
-            jsonBody.proof.tx.body.deviceHash,
-            jsonBody.proof.tx.body.deviceSignature,
+            jsonBody.tx.body.device.publicKey,
+            jsonBody.tx.body.deviceHash,
+            jsonBody.tx.body.deviceSignature,
           )
         ) {
           return Respond.send(
@@ -77,7 +72,7 @@ async function handleNewUser(req: Request, res: Response) {
         const db = dbClient.database("prism");
         const users = db.collection<User>("users");
 
-        if (await users.findOne({ username: jsonBody.username })) {
+        if (await users.findOne({ username: jsonBody.tx.body.username })) {
           return Respond.send(
             res,
             400,
@@ -88,21 +83,26 @@ async function handleNewUser(req: Request, res: Response) {
             _id: Snowflake.generate({
               epoch: new Date("July 06 2021").getTime() / 1000,
             }),
-            username: jsonBody.username,
-            userPublicKey: jsonBody.newUserPublicKey,
+            username: jsonBody.tx.body.username,
+            userPublicKey: jsonBody.tx.body.publicKey,
+            connections: null,
+            bio: "",
+            name: jsonBody.tx.body.name,
+            avatarURL: "",
             clients: [
               {
                 _id: Snowflake.generate({
                   epoch: new Date("July 06 2021").getTime() / 1000,
                 }),
-                name: jsonBody.newDeviceName,
-                clientPublicKey: jsonBody.newDevicePublicKey,
+                name: jsonBody.tx.body.device.name,
+                clientPublicKey: jsonBody.tx.body.device.publicKey,
                 paperKey: false,
+                createdAt: Date.now()
               },
             ],
             createdAt: Date.now(),
             tempKeys: [],
-            chain: [jsonBody.proof],
+            chain: [jsonBody],
           }).then((u) => {
             res.status = 200;
             res.body = u;
