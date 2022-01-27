@@ -5,16 +5,16 @@ export type User = {
   userPublicKey: string;
   bio: string;
   name: string;
-  avatarURL: string;
+  avatarHash: string;
   connections: {
     eth: {
       address: string;
-      proofHash: string
-    } | null
+      proofHash: string;
+    } | null;
     deso: {
       address: string;
-      proofHash: string
-    } | null
+      proofHash: string;
+    } | null;
   } | null;
   clients: [
     {
@@ -22,7 +22,7 @@ export type User = {
       name: string;
       clientPublicKey: string;
       paperKey: boolean;
-      createdAt: number
+      createdAt: number;
     },
   ];
   createdAt: number;

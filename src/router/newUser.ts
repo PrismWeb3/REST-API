@@ -48,7 +48,8 @@ async function handleNewUser(req: Request, res: Response) {
         public key to a username that it did not request (And that the client sending the request actually owns the private key).
          */
         if (
-          !jsonBody.tx || !jsonBody.tx.body.username  || !jsonBody.tx.body.name || jsonBody.tx.type != "newUser" ||
+          !jsonBody.tx || !jsonBody.tx.body.username ||
+          !jsonBody.tx.body.name || jsonBody.tx.type != "newUser" ||
           jsonBody.tx.prevHash != null || jsonBody.tx.body.id ||
           jsonBody.txHash !=
             await Crypto.hash(JSON.stringify(jsonBody.tx)) ||
@@ -88,7 +89,7 @@ async function handleNewUser(req: Request, res: Response) {
             connections: null,
             bio: "",
             name: jsonBody.tx.body.name,
-            avatarURL: "",
+            avatarHash: "QmdXgbfR8pFxE11t1yCdomNWtgz8EaNKr5rqXYeBj1uwcS",
             clients: [
               {
                 _id: Snowflake.generate({
@@ -97,7 +98,7 @@ async function handleNewUser(req: Request, res: Response) {
                 name: jsonBody.tx.body.device.name,
                 clientPublicKey: jsonBody.tx.body.device.publicKey,
                 paperKey: false,
-                createdAt: Date.now()
+                createdAt: Date.now(),
               },
             ],
             createdAt: Date.now(),
@@ -118,7 +119,7 @@ async function handleNewUser(req: Request, res: Response) {
           return Respond.send(
             res,
             400,
-            Errors.unknownPayloadTooLarge,
+            Errors.invalidJsonBody,
           );
         } catch {
           // If an unexpected error occurs the above response fail, so we catch any possble errors to save the process from exiting.
