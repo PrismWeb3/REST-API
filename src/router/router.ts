@@ -1,5 +1,5 @@
 import { Request, Response, Router, RouterContext } from "../deps.ts";
-import { handleGetUser, handleNewUser } from "./export.ts";
+import { handleEditUser, handleGetUser, handleNewUser } from "./export.ts";
 
 class Routes {
   req: Request;
@@ -25,6 +25,9 @@ class Routes {
   async GetUser() {
     await handleGetUser(this.req, this.res);
   }
+  async EditUser() {
+    await handleEditUser(this.req, this.res);
+  }
 }
 
 const router = new Router();
@@ -37,6 +40,9 @@ router
   })
   .post("/getUser", async (context) => {
     await new Routes(context).GetUser();
+  })
+  .post("/editUser", async (context) => {
+    await new Routes(context).EditUser();
   });
 
 export { router };

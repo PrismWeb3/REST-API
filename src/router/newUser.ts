@@ -1,15 +1,26 @@
 import { Request, Response, Snowflake } from "../deps.ts";
 import { Crypto, Respond } from "../utils/export.ts";
 import { dbClient } from "../main.ts";
-import { PostReqest, User } from "../types/export.ts";
+import { NewUserTX, PostRequest, User } from "../types/export.ts";
 import { Errors } from "../global/export.ts";
 
 async function handleNewUser(req: Request, res: Response) {
   if (Respond.checkContetType(req, res, "application/json")) {
     await req
       .body({ type: "json" })
-      .value.then(async (jsonBody: PostReqest) => {
-        if (!jsonBody.tx.body.username || !jsonBody.tx.body.device.name) {
+      .value.then(async (jsonBody: PostRequest<NewUserTX>) => {
+        if (jsonBody.tx.type != "newUser") {
+          return Respond.send(
+            res,
+            400,
+            Errors.invalidProof,
+          );
+        }
+
+        // We should also add a check to ensure the username is actually valid (> 4 chars, no spaces, whatever)
+        // This isnt implemented anywhere as of yet (i.e should be added here, and in editUser)
+
+        if (!jsonBody.tx.body?.username || !jsonBody.tx.body.device.name) {
           return Respond.send(
             res,
             400,
@@ -42,14 +53,11 @@ async function handleNewUser(req: Request, res: Response) {
         We should probally also check that the keys are in fact 4096 keys, but for now we'll trust the client.
         In theroy this isn't a huge deal, it just allows accounts to be less secure if an indivisual client so chooses
         Adding this check later on should be considered!
-        --
-        Another feature that should be considered is a signature proof for the initial sign up. This would generate a proof in
-        which you could verify that a speciifc key has "chosen" a username. This ensures that the server did not assign an initial
-        public key to a username that it did not request (And that the client sending the request actually owns the private key).
-         */
+        */
+
         if (
           !jsonBody.tx || !jsonBody.tx.body.username ||
-          !jsonBody.tx.body.name || jsonBody.tx.type != "newUser" ||
+          !jsonBody.tx.body.name ||
           jsonBody.tx.prevHash != null || jsonBody.tx.body.id ||
           jsonBody.txHash !=
             await Crypto.hash(JSON.stringify(jsonBody.tx)) ||
@@ -73,14 +81,24 @@ async function handleNewUser(req: Request, res: Response) {
         const db = dbClient.database("prism");
         const users = db.collection<User>("users");
 
-        if (await users.findOne({ username: jsonBody.tx.body.username })) {
+        if (
+          await users.findOne({
+            $or: [
+              // This querey should be changed to case insensitive. You can't have "@user" & "@USER" both exist
+
+              { username: jsonBody.tx.body.username },
+              { userPublicKey: jsonBody.tx.body.publicKey },
+              // I don't think it's necisary to ensure client public key's are unique, so we won't check for dupes here.
+            ],
+          })
+        ) {
           return Respond.send(
             res,
             400,
             Errors.existingUsername,
           );
         } else {
-          await users.insertOne({
+          const newUser: User = {
             _id: Snowflake.generate({
               epoch: new Date("July 06 2021").getTime() / 1000,
             }),
@@ -104,16 +122,16 @@ async function handleNewUser(req: Request, res: Response) {
             createdAt: Date.now(),
             tempKeys: [],
             chain: [jsonBody],
-          }).then((u) => {
-            res.status = 200;
-            res.body = u;
-          }).catch((e) => {
+          };
+          await users.insertOne(newUser).catch((e) => {
             console.error(e);
+          }).then((_) => {
+            res.status = 200;
+            res.body = newUser;
           });
         }
       })
-      .catch((e) => {
-        console.error("E:", e);
+      .catch((_) => {
         // We could probally use the error to provide a better response message, but this should surfice for now.
         try {
           return Respond.send(

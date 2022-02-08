@@ -24,7 +24,7 @@ async function handleGetUser(req: Request, res: Response) {
             ? "userPublicKey"
             : (jsonBody.username ? "username" : null));
         if (!key) {
-          Respond.send(res, 400, Errors.invalidGetUserInput);
+          Respond.send(res, 400, Errors.invalidUserInput);
         } else {
           await users.findOne({ [key]: jsonBody[key === "_id" ? "id" : key] })
             .then((user) => {

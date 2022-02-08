@@ -11,3 +11,15 @@ export type NewUserTX = {
     publicKey: string; // Base-64 encoded RSA Public Key
   };
 };
+
+export type EditUserTX = {
+  id?: null;
+  username?: string;
+  userPublicKey?: string; // Base-64 encoded RSA Public Key
+  newUserData: {
+    username?: string;
+    name?: string;
+    bio?: string;
+    avatarHash?: string;
+  };
+};

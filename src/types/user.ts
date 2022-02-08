@@ -1,4 +1,4 @@
-import { PostReqest } from "./export.ts";
+import { EditUserTX, NewUserTX, PostRequest } from "./export.ts";
 export type User = {
   _id: string;
   username: string;
@@ -31,5 +31,5 @@ export type User = {
     expiresAt: number;
     signedBy: string;
   }] | [];
-  chain: [PostReqest];
+  chain: [PostRequest<NewUserTX | EditUserTX>];
 };
