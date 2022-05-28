@@ -1,3 +1,4 @@
+import { FormDataFile } from "../deps.ts";
 export type GetUserRequest = {
   id?: string;
   userPublicKey?: string; // Base64-encoded RSA Public Key PEM
@@ -11,4 +12,16 @@ export type PostRequest<Body> = {
     type: "newUser" | "editUser"; // Add event types as they're created
     body: Body; // Add event types as they're created
   };
+};
+
+export type UploadRequest = {
+  images: FormDataFile[] | undefined;
+  contextHash: string; // Hash of context JSON string
+  context: {
+    timestamp: number; // Unix timestamp in MS, ALWAYS USE UTC!!
+    type: "avatar" | "message";
+    id: string; // ID of User (avatar) or Message Channel; This just makes it easier to filter down when requesting getImage
+    userPublicKey: string; // PublicKey of User (who sent the message / changed avatar); Used to verify signature
+  } | undefined;
+  signature: string; // Signed contextHash; This is just used to ensure the request comes from a valid Prism user
 };

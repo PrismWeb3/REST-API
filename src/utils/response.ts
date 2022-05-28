@@ -1,7 +1,11 @@
 import { Request, Response } from "../deps.ts";
-import { Errors } from "../global/export.ts";
+import { Constants } from "../global/export.ts";
 class Respond {
-  static send = (res: Response, code: number, msg: string | JSON) => {
+  static send = (
+    res: Response,
+    code: number,
+    msg: string | JSON | Record<string, unknown>,
+  ) => {
     res.status = code;
     res.body = msg + "\n";
   };
@@ -11,11 +15,11 @@ class Respond {
     res: Response,
     contentType: string,
   ) => {
-    if (req.headers.get("Content-Type") != contentType) {
+    if (!req.headers.get("Content-Type")?.includes(contentType)) {
       Respond.send(
         res,
         400,
-        Errors.contentTypeNotFound,
+        Constants.Errors.contentTypeNotFound,
       );
       return false;
     } else return true;

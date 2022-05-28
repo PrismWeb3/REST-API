@@ -15,7 +15,7 @@ services:
       - ./data/certbot/conf:/etc/letsencrypt
       - ./data/certbot/www:/var/www/certbot
     depends_on: 
-      - validator
+      - server
     ports:
       - 80:80
       - 443:443
@@ -42,9 +42,29 @@ services:
       driver: none
     profiles:
       - dev
-  validator:
-    container_name: validator
-    image: validator:latest
+  ipfs:
+    container_name: ipfs
+    image: ipfs/go-ipfs:latest
+    environment:
+      - IPFS_PROFILE=server
+      - IPFS_PATH=/ipfsdata
+    volumes:
+      - ./data/ipfs:/ipfsdata
+    expose:
+      - "5001"
+      - "8080"
+    ports:
+      - "4001:4001" # libp2p swarm port; Keep this exposed
+      - "127.0.0.1:8080:8080" # Gateway port; This should stay closed
+      - "127.0.0.1:5001:5001" # HTTP API port; KEEP CLOSED AT ALL TIMES!!!!
+      # If we choose to run IPFS on a side server in prod, we'll allow access to these only from our REST server's IP
+    profiles:
+      - dev
+    logging:
+      driver: none
+  server:
+    container_name: server
+    image: server:latest
     build: ../
     ports:
     - 7621:7621

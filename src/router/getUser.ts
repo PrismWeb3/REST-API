@@ -1,7 +1,7 @@
 import { dbClient } from "../main.ts";
 import { Respond } from "../utils/export.ts";
 import { Request, Response } from "../deps.ts";
-import { Errors } from "../global/export.ts";
+import { Constants } from "../global/export.ts";
 import { GetUserRequest, User } from "../types/export.ts";
 
 async function handleGetUser(req: Request, res: Response) {
@@ -24,13 +24,18 @@ async function handleGetUser(req: Request, res: Response) {
             ? "userPublicKey"
             : (jsonBody.username ? "username" : null));
         if (!key) {
-          Respond.send(res, 400, Errors.invalidUserInput);
+          Respond.send(res, 400, Constants.Errors.invalidUserInput);
         } else {
           await users.findOne({ [key]: jsonBody[key === "_id" ? "id" : key] })
             .then((user) => {
-              if (!user) return Respond.send(res, 404, Errors.UserNotFound);
-              else if (
-                user[key] === jsonBody[key === "_id" ? "id" : key]
+              if (!user) {
+                return Respond.send(res, 404, Constants.Errors.UserNotFound);
+              } else if (
+                user[key] === jsonBody[
+                  key === "_id"
+                    ? "id"
+                    : key
+                ]
               ) {
                 return Respond.send(res, 200, JSON.stringify(user));
               }

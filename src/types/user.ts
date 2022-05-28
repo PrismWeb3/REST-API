@@ -38,7 +38,7 @@ export type User = {
   tempKeys: [{
     publicKey: string;
     expiresAt: number;
-    signedBy: string;
+    proofHash: string;
   }] | [];
   chain: [PostRequest<NewUserTX | EditUserTX>];
 };

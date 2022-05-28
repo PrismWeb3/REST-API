@@ -11,5 +11,6 @@ RUN deno cache deps.ts
 
 ADD src .
 
-# Adding the --watch flag may be beneficial for Non-M1 machines for easier development flow
-CMD ["deno", "run", "--allow-net", "--allow-env", "--allow-read", "--allow-run", "main.ts"]
+# Adding the --watch flag may be beneficial on Non-M1 machines during development
+# We allow write to /tmp as it's required by Oak for multipart requests
+CMD ["deno", "run", "--allow-net", "--allow-env", "--allow-write=/tmp", "--allow-read", "--allow-run", "main.ts"]

@@ -1,0 +1,88 @@
+# Postman request - this works
+server     | 2022-03-01T15:39:47.306279458Z Request {
+server     | 2022-03-01T15:39:47.306323750Z   hasBody: true,
+server     | 2022-03-01T15:39:47.306328125Z   headers: Headers {
+server     | 2022-03-01T15:39:47.306330417Z   accept: "*/*",
+server     | 2022-03-01T15:39:47.306332708Z   "accept-encoding": "gzip, deflate, br",
+server     | 2022-03-01T15:39:47.306339583Z   connection: "keep-alive",
+server     | 2022-03-01T15:39:47.306347833Z   "content-length": "78207",
+server     | 2022-03-01T15:39:47.306353917Z   "content-type": "multipart/form-data; boundary=--------------------------573283019221138380905650",
+server     | 2022-03-01T15:39:47.306363167Z   host: "localhost:7621",
+server     | 2022-03-01T15:39:47.306368708Z   "postman-token": "77c3eb74-ca0d-4eef-ad6f-419ff202e1af",
+server     | 2022-03-01T15:39:47.306373625Z   "user-agent": "PostmanRuntime/7.28.4"
+server     | 2022-03-01T15:39:47.306375625Z },
+server     | 2022-03-01T15:39:47.306377500Z   ip: "172.18.0.1",
+server     | 2022-03-01T15:39:47.306379458Z   ips: [],
+server     | 2022-03-01T15:39:47.306381292Z   method: "POST",
+server     | 2022-03-01T15:39:47.306383167Z   secure: false,
+server     | 2022-03-01T15:39:47.306385167Z   url: "http://localhost:7621/uploadImage"
+server     | 2022-03-01T15:39:47.306391833Z } 
+server     | 2022-03-01T15:39:47.306391833Z {
+server     | 2022-03-01T15:39:47.306394333Z   fields: { context: "{}" },
+server     | 2022-03-01T15:39:47.306408042Z   files: [
+server     | 2022-03-01T15:39:47.306411750Z     {
+server     | 2022-03-01T15:39:47.306418625Z       content: undefined,
+server     | 2022-03-01T15:39:47.306423042Z       contentType: "image/jpeg",
+server     | 2022-03-01T15:39:47.306425292Z       name: "image",
+server     | 2022-03-01T15:39:47.306430583Z       filename: "/tmp/8bce24f3/b8f2ccf5c384e127c03358d7a9975f194c42b949.jpeg",
+server     | 2022-03-01T15:39:47.306435792Z       originalName: "2-21918_download-transparent-background-facebook-logo-clipart-facebook-logo.png.jpeg"
+server     | 2022-03-01T15:39:47.306443000Z     }
+server     | 2022-03-01T15:39:47.306450542Z   ]
+server     | 2022-03-01T15:39:47.306457042Z }
+
+------------------------------------------------------------------------------------
+
+# Curl request - this works
+curl --location --request POST 'http://localhost:7621/uploadImage' \
+--form 'image=@"/Users/hpaulson/Downloads/2-21918_download-transparent-background-facebook-logo-clipart-facebook-logo.png.jpeg"' \
+--form 'context="{}"'
+
+server     | 2022-03-01T16:00:06.316953796Z Request {
+server     | 2022-03-01T16:00:06.317001837Z   hasBody: true,
+server     | 2022-03-01T16:00:06.317006462Z   headers: Headers {
+server     | 2022-03-01T16:00:06.317008796Z   accept: "*/*",
+server     | 2022-03-01T16:00:06.317011171Z   "content-length": "78177",
+server     | 2022-03-01T16:00:06.317013296Z   "content-type": "multipart/form-data; boundary=------------------------730e037fba13186a",
+server     | 2022-03-01T16:00:06.317020129Z   host: "localhost:7621",
+server     | 2022-03-01T16:00:06.317022587Z   "user-agent": "curl/7.77.0"
+server     | 2022-03-01T16:00:06.317024546Z },
+server     | 2022-03-01T16:00:06.317026421Z   ip: "172.18.0.1",
+server     | 2022-03-01T16:00:06.317028546Z   ips: [],
+server     | 2022-03-01T16:00:06.317030379Z   method: "POST",
+server     | 2022-03-01T16:00:06.317033212Z   secure: false,
+server     | 2022-03-01T16:00:06.317037921Z   url: "http://localhost:7621/uploadImage"
+server     | 2022-03-01T16:00:06.317039879Z }
+server     | 2022-03-01T16:00:06.445050837Z {
+server     | 2022-03-01T16:00:06.445076629Z   fields: { context: "{}" },
+server     | 2022-03-01T16:00:06.445080796Z   files: [
+server     | 2022-03-01T16:00:06.445082962Z     {
+server     | 2022-03-01T16:00:06.445085337Z       content: undefined,
+server     | 2022-03-01T16:00:06.445094296Z       contentType: "image/jpeg",
+server     | 2022-03-01T16:00:06.445097004Z       name: "image",
+server     | 2022-03-01T16:00:06.445099046Z       filename: "/tmp/5d4fb72b/45a36fe827ba6f15bebec21e5b4089a2e826fc23.jpeg",
+server     | 2022-03-01T16:00:06.445101254Z       originalName: "2-21918_download-transparent-background-facebook-logo-clipart-facebook-logo.png.jpeg"
+server     | 2022-03-01T16:00:06.445103462Z     }
+server     | 2022-03-01T16:00:06.445105296Z   ]
+server     | 2022-03-01T16:00:06.445107129Z }
+
+------------------------------------------------------------------------------------
+
+# Client-side fetch request - this doesn't work
+server     | 2022-03-01T15:41:12.342562470Z Request {
+server     | 2022-03-01T15:41:12.342604470Z   hasBody: true,
+server     | 2022-03-01T15:41:12.342609262Z   headers: Headers {
+server     | 2022-03-01T15:41:12.342611595Z   accept: "*/*",
+server     | 2022-03-01T15:41:12.342616053Z   "accept-encoding": "gzip, deflate",
+server     | 2022-03-01T15:41:12.342622137Z   "accept-language": "en-US,en;q=0.9",
+server     | 2022-03-01T15:41:12.342627845Z   connection: "keep-alive",
+server     | 2022-03-01T15:41:12.342629720Z   "content-length": "1078",
+server     | 2022-03-01T15:41:12.342631762Z   "content-type": "multipart/form-data; boundary=ziO9MHNgWOGGm52iLuA19-Jwxm_PY_kf9jR9E-PKtsZnJY6ePUrkwMfPDXKHqRZb.vKwxA",
+server     | 2022-03-01T15:41:12.342634678Z   host: "localhost:7621",
+server     | 2022-03-01T15:41:12.342636845Z   "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14...."
+server     | 2022-03-01T15:41:12.342638970Z },
+server     | 2022-03-01T15:41:12.342640845Z   ip: "172.18.0.1",
+server     | 2022-03-01T15:41:12.342642720Z   ips: [],
+server     | 2022-03-01T15:41:12.342644595Z   method: "POST",
+server     | 2022-03-01T15:41:12.342646637Z   secure: false,
+server     | 2022-03-01T15:41:12.342648553Z   url: "http://localhost:7621/uploadImage"
+server     | 2022-03-01T15:41:12.342650887Z }

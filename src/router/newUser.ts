@@ -2,7 +2,7 @@ import { Request, Response, Snowflake } from "../deps.ts";
 import { Crypto, IPFS, Respond } from "../utils/export.ts";
 import { dbClient } from "../main.ts";
 import { NewUserTX, PostRequest, User } from "../types/export.ts";
-import { Errors } from "../global/export.ts";
+import { Constants } from "../global/export.ts";
 
 async function handleNewUser(req: Request, res: Response) {
   if (Respond.checkContetType(req, res, "application/json")) {
@@ -10,18 +10,26 @@ async function handleNewUser(req: Request, res: Response) {
       .body({ type: "json" })
       .value.then(async (jsonBody: PostRequest<NewUserTX>) => {
         if (jsonBody.tx.type != "newUser") {
-          return Respond.send(res, 400, Errors.invalidProof);
+          return Respond.send(res, 400, Constants.Errors.invalidProof);
         }
 
         // We should also add a check to ensure the username is actually valid (> 4 chars, no spaces, whatever)
         // This isnt implemented anywhere as of yet (i.e should be added here, and in editUser)
 
         if (!jsonBody.tx.body?.username || !jsonBody.tx.body.device.name) {
-          return Respond.send(res, 400, Errors.usernameDeviceNameNotFound);
+          return Respond.send(
+            res,
+            400,
+            Constants.Errors.usernameDeviceNameNotFound,
+          );
         }
 
         if (jsonBody.tx.body.publicKey === jsonBody.tx.body.device.publicKey) {
-          return Respond.send(res, 400, Errors.duplicateSignupKeyInputs);
+          return Respond.send(
+            res,
+            400,
+            Constants.Errors.duplicateSignupKeyInputs,
+          );
         }
 
         try {
@@ -30,7 +38,7 @@ async function handleNewUser(req: Request, res: Response) {
               atob(jsonBody.tx.body.device.publicKey),
             );
         } catch {
-          return Respond.send(res, 400, Errors.invalidSignupKeys);
+          return Respond.send(res, 400, Constants.Errors.invalidSignupKeys);
         }
 
         /*
@@ -63,7 +71,7 @@ async function handleNewUser(req: Request, res: Response) {
             jsonBody.tx.body.deviceSignature,
           ))
         ) {
-          return Respond.send(res, 400, Errors.invalidProof);
+          return Respond.send(res, 400, Constants.Errors.invalidProof);
         }
         const db = dbClient.database("prism");
         const users = db.collection<User>("users");
@@ -79,7 +87,7 @@ async function handleNewUser(req: Request, res: Response) {
             ],
           })
         ) {
-          return Respond.send(res, 400, Errors.existingUsername);
+          return Respond.send(res, 400, Constants.Errors.existingUsername);
         } else {
           const newUser: User = {
             _id: Snowflake.generate({
@@ -122,7 +130,7 @@ async function handleNewUser(req: Request, res: Response) {
       .catch((_) => {
         // We could probally use the error to provide a better response message, but this should surfice for now.
         try {
-          return Respond.send(res, 400, Errors.invalidJsonBody);
+          return Respond.send(res, 400, Constants.Errors.invalidJsonBody);
         } catch {
           // If an unexpected error occurs the above response fail, so we catch any possble errors to save the process from exiting.
           return;

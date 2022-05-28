@@ -1,10 +1,11 @@
-import { Application } from "./deps.ts";
+import { Application, RateLimiter } from "./deps.ts";
 import { router } from "./router/export.ts";
 import { DataBase } from "./db/connect.ts";
+import { IPFS } from "./utils/export.ts";
 import { Events } from "./events/events.ts";
-import { RateLimiter } from "https://deno.land/x/oak_rate_limit/mod.ts";
 
 const dbClient = await DataBase.connect();
+new IPFS().isOnline();
 
 const rateLimit = RateLimiter({
   windowMs: 1000,

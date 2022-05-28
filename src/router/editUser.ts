@@ -2,7 +2,7 @@ import { Request, Response } from "../deps.ts";
 import { Crypto, Respond } from "../utils/export.ts";
 import { dbClient } from "../main.ts";
 import { EditUserTX, PostRequest, User } from "../types/export.ts";
-import { Errors } from "../global/export.ts";
+import { Constants } from "../global/export.ts";
 
 async function handleEditUser(req: Request, res: Response) {
   if (Respond.checkContetType(req, res, "application/json")) {
@@ -10,7 +10,7 @@ async function handleEditUser(req: Request, res: Response) {
       .body({ type: "json" })
       .value.then(async (jsonBody: PostRequest<EditUserTX>) => {
         if (jsonBody.tx.type != "editUser") {
-          return Respond.send(res, 400, Errors.invalidProof);
+          return Respond.send(res, 400, Constants.Errors.invalidProof);
         }
 
         const db = dbClient.database("prism");
@@ -28,7 +28,7 @@ async function handleEditUser(req: Request, res: Response) {
           : null;
 
         if (!key) {
-          Respond.send(res, 400, Errors.invalidUserInput);
+          Respond.send(res, 400, Constants.Errors.invalidUserInput);
         } else {
           await users.findOne({
             [key]: jsonBody.tx.body[key === "_id" ? "id" : key],
@@ -37,8 +37,9 @@ async function handleEditUser(req: Request, res: Response) {
               // Admittedly, we throw invalidProof for a LOT of dif. situations in this endpoint & others. It's probally smart to add
               // additional more specific errors to improve dev flow, otherwise this could get annoying for 3rd party engineers
 
-              if (!user) return Respond.send(res, 404, Errors.UserNotFound);
-              else if (
+              if (!user) {
+                return Respond.send(res, 404, Constants.Errors.UserNotFound);
+              } else if (
                 user[key] === jsonBody.tx.body[key === "_id" ? "id" : key]
               ) {
                 if (
@@ -48,7 +49,7 @@ async function handleEditUser(req: Request, res: Response) {
                   return Respond.send(
                     res,
                     400,
-                    Errors.invalidProof,
+                    Constants.Errors.invalidProof,
                   );
                 }
 
@@ -62,7 +63,7 @@ async function handleEditUser(req: Request, res: Response) {
                   return Respond.send(
                     res,
                     400,
-                    Errors.invalidProof,
+                    Constants.Errors.invalidProof,
                   );
                 }
 
@@ -78,7 +79,7 @@ async function handleEditUser(req: Request, res: Response) {
                   return Respond.send(
                     res,
                     400,
-                    Errors.invalidProof,
+                    Constants.Errors.invalidProof,
                   );
                 }
 
@@ -89,7 +90,7 @@ async function handleEditUser(req: Request, res: Response) {
                   return Respond.send(
                     res,
                     400,
-                    Errors.invalidProof,
+                    Constants.Errors.invalidProof,
                   );
                 }
 
@@ -97,7 +98,7 @@ async function handleEditUser(req: Request, res: Response) {
                   return Respond.send(
                     res,
                     400,
-                    Errors.invalidProof,
+                    Constants.Errors.invalidProof,
                   );
                 }
 
@@ -108,7 +109,7 @@ async function handleEditUser(req: Request, res: Response) {
                   return Respond.send(
                     res,
                     400,
-                    Errors.invalidProof,
+                    Constants.Errors.invalidProof,
                   );
                 }
 
@@ -134,7 +135,7 @@ async function handleEditUser(req: Request, res: Response) {
                   return Respond.send(
                     res,
                     400,
-                    Errors.invalidProof,
+                    Constants.Errors.invalidProof,
                   );
                 } else {
                   const merge = { ...user, ...jsonBody.tx.body.newUserData };
@@ -146,7 +147,7 @@ async function handleEditUser(req: Request, res: Response) {
                 return Respond.send(
                   res,
                   500,
-                  Errors.unknownServerError,
+                  Constants.Errors.unknownServerError,
                 );
               }
             });
